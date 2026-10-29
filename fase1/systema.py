@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 class Chegada:
     def __init__(self, data, horario, linha):
         self.data = data
@@ -125,6 +127,26 @@ class ArvoreBinariaBusca:
                     candidato = atual
                 elif instante_atual < (candidato.data, candidato.horario):
                     candidato = atual
+
+            pilha.append(atual.esquerda)
+            pilha.append(atual.direita)
+
+        return candidato
+
+    def proximo_linha_no_dia(self, data, horario, linha):
+        candidato = None
+        pilha = [self.raiz]
+
+        while pilha:
+            atual = pilha.pop()
+
+            if atual is None:
+                continue
+
+            if atual.data == data and atual.linha == linha:
+                if atual.horario >= horario:
+                    if candidato is None or atual.horario < candidato.horario:
+                        candidato = atual
 
             pilha.append(atual.esquerda)
             pilha.append(atual.direita)
@@ -282,34 +304,19 @@ while True:
         for data_consultada, espera in resultados:
             print(data_consultada, espera)
 
-arvore.inserir(No("2026-10-28", "18:30:00", "136"))
-arvore.inserir(No("2026-10-28", "18:00:00", "110"))
-arvore.inserir(No("2026-10-28", "19:00:00", "170"))
+    elif comando == "ENTRE":
+        data1 = partes[1]
+        horario1 = partes[2]
+        data2 = partes[3]
+        horario2 = partes[4]
 
-procurado = No("2026-10-28", "18:00:00", "136.1")
-resultado = arvore.buscar(procurado)
+        resultados = arvore.entre(data1, horario1, data2, horario2)
 
-if resultado:
-    print("ACHOU")
-else:
-    print("NAO ACHOU")
+        print(len(resultados))
 
-print(arvore.altura())
+        for chegada in resultados:
+            print(chegada.data, chegada.horario, chegada.linha)
 
-resultado = arvore.proximo("2026-10-28", "18:15:00")
 
-if resultado is None:
-    print("NENHUM")
-else:
-    print(resultado.data, resultado.horario, resultado.linha)
-
-resultado = arvore.proximo_linha(
-    "2026-10-28", "18:15:00", "110"
-)
-
-if resultado is None:
-    print("NENHUM")
-else:
-    print(resultado.data, resultado.horario)
 
 
