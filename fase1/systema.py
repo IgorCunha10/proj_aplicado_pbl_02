@@ -76,13 +76,27 @@ class ArvoreBinariaBusca:
 
         return False
 
+    def altura(self):
+        return self._altura(self.raiz)
+
+    def _altura(self, atual):
+        if atual is None:
+            return 0
+
+        esquerda = self._altura(atual.esquerda)
+        direita = self._altura(atual.direita)
+
+        if esquerda > direita:
+            return esquerda + 1
+        else:
+            return direita + 1
+
 
 arvore = ArvoreBinariaBusca()
 
 arvore.inserir(No("2026-10-28", "18:30:00", "136"))
 arvore.inserir(No("2026-10-28", "18:00:00", "110"))
 arvore.inserir(No("2026-10-28", "19:00:00", "170"))
-
 
 procurado = No("2026-10-28", "18:00:00", "136.1")
 resultado = arvore.buscar(procurado)
@@ -91,4 +105,7 @@ if resultado:
     print("ACHOU")
 else:
     print("NAO ACHOU")
+
+print(arvore.altura())
+
 
