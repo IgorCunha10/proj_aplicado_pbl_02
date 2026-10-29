@@ -61,16 +61,34 @@ class ArvoreBinariaBusca:
 
         return True
 
+    def buscar(self, procurado):
+        atual = self.raiz
+
+        while atual is not None:
+            resultado = comparar(procurado, atual)
+
+            if resultado == 0:
+                return True
+            elif resultado == -1:
+                atual = atual.esquerda
+            else:
+                atual = atual.direita
+
+        return False
+
 
 arvore = ArvoreBinariaBusca()
 
-primeiro = No("2026-10-28", "18:30:00", "136.1")
-segundo = No("2026-10-28", "18:00:00", "136.5")
-terceiro = No("2026-10-28", "19:00:00", "136.2")
-
-print(arvore.inserir(primeiro))
-print(arvore.inserir(segundo))
-print(arvore.inserir(terceiro))
+arvore.inserir(No("2026-10-28", "18:30:00", "136"))
+arvore.inserir(No("2026-10-28", "18:00:00", "110"))
+arvore.inserir(No("2026-10-28", "19:00:00", "170"))
 
 
+procurado = No("2026-10-28", "18:00:00", "136.1")
+resultado = arvore.buscar(procurado)
+
+if resultado:
+    print("ACHOU")
+else:
+    print("NAO ACHOU")
 
