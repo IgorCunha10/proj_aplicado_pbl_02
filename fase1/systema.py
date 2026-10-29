@@ -195,8 +195,6 @@ class ArvoreBinariaBusca:
 
         return atual, True
 
-    
-
 
 arvore = ArvoreBinariaBusca()
 
