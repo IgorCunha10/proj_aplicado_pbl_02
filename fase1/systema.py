@@ -195,8 +195,92 @@ class ArvoreBinariaBusca:
 
         return atual, True
 
+    def espera_semanal(self, linha, data, horario, k):
+        resultados = []
+
+        data_final = datetime.strptime(data, "%Y-%m-%d").date()
+        data_inicial = data_final - timedelta(weeks=k - 1)
+
+        for i in range(k):
+            dia = data_inicial + timedelta(weeks=i)
+            data_consultada = dia.strftime("%Y-%m-%d")
+
+            chegada = self.proximo_linha_no_dia(
+                data_consultada, horario, linha
+            )
+
+            if chegada is None:
+                resultados.append((data_consultada, "NAOPASSOU"))
+            else:
+                hora_inicio = datetime.strptime(
+                    horario, "%H:%M:%S"
+                )
+                hora_chegada = datetime.strptime(
+                    chegada.horario, "%H:%M:%S"
+                )
+
+                espera = int((hora_chegada - hora_inicio).total_seconds())
+
+                resultados.append((data_consultada, str(espera)))
+
+        return resultados
+
 
 arvore = ArvoreBinariaBusca()
+
+while True:
+    try:
+        entrada = input()
+    except EOFError:
+        break
+
+    entrada = entrada.strip()
+
+    if not entrada or entrada.startswith("#"):
+        continue
+
+    partes = entrada.split()
+    comando = partes[0]
+
+    if comando == "REG":
+        data = partes[1]
+        horario = partes[2]
+        linha = partes[3]
+
+        novo_no = No(data, horario, linha)
+
+        if arvore.inserir(novo_no):
+            print("OK")
+        else:
+            print("DUPLICADO")
+
+    elif comando == "BUSCA":
+        data = partes[1]
+        horario = partes[2]
+        linha = partes[3]
+
+        procurado = No(data, horario, linha)
+
+        if arvore.buscar(procurado):
+            print("ACHOU")
+        else:
+            print("NAO")
+
+    elif comando == "ALT":
+        print(arvore.altura())
+
+    elif comando == "SEMANA":
+        linha = partes[1]
+        data = partes[2]
+        horario = partes[3]
+        k = int(partes[4])
+
+        resultados = arvore.espera_semanal(
+            linha, data, horario, k
+        )
+
+        for data_consultada, espera in resultados:
+            print(data_consultada, espera)
 
 arvore.inserir(No("2026-10-28", "18:30:00", "136"))
 arvore.inserir(No("2026-10-28", "18:00:00", "110"))
