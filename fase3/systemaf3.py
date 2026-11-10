@@ -16,7 +16,7 @@
 import sys
 import time
 from datetime import datetime, timedelta
-sys.setrecursionlimit(1000000) # antes ele quebrava passando o limite
+# sys.setrecursionlimit(1000000) # antes ele quebrava passando o limite
 
 # nó AVL
 class No:
