@@ -47,3 +47,22 @@ def executar_teste(nome, programa, entrada, esperado):
         print(f"  Quantidade esperada: {len(linhas_esperadas)}")
         print(f"  Quantidade obtida:  {len(linhas_obtidas)}")
     return False
+
+def main():
+    entrada = CARGAS / "pequeno.txt"
+    if not entrada.exists():
+        print(f"Arquivo de entrada não encontrado: {entrada}")
+        raise SystemExit(1)
+
+    resultados = [
+        executar_teste(nome, programa, entrada, esperado)
+        for nome, programa, esperado in PROGRAMAS
+    ]
+
+    aprovados = sum(resultados)
+    print(f"\nResultado: {aprovados}/{len(resultados)} testes aprovados.")
+    raise SystemExit(0 if aprovados == len(resultados) else 1)
+
+
+if __name__ == "__main__":
+    main()
