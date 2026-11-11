@@ -2,10 +2,7 @@
 from pathlib import Path
 import sys
 
-# Caminho da raiz do projeto
 RAIZ = Path(__file__).resolve().parent.parent
-
-# Permite importar os módulos das fases 2 e 3
 sys.path.insert(0, str(RAIZ))
 
 from fase2.systemaf2 import ArvoreBinariaBusca, No as NoABB
@@ -66,6 +63,24 @@ def carregar_registros(caminho):
                 )
 
     return registros
+
+
+def construir_abb(registros):
+    """Constrói uma ABB utilizando os registros recebidos."""
+
+    arvore = ArvoreBinariaBusca()
+    inseridos = 0
+    duplicados = 0
+
+    for data, horario, linha in registros:
+        no = NoABB(data, horario, linha)
+
+        if arvore.inserir(no):
+            inseridos += 1
+        else:
+            duplicados += 1
+
+    return arvore, inseridos, duplicados
 
 
 def testar_leitura_cargas():
