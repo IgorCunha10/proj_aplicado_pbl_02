@@ -82,6 +82,23 @@ def construir_abb(registros):
 
     return arvore, inseridos, duplicados
 
+def construir_avl(registros):
+    """Constrói uma AVL utilizando os registros recebidos."""
+
+    arvore = AVL()
+    inseridos = 0
+    duplicados = 0
+
+    for data, horario, linha in registros:
+        no = NoAVL(data, horario, linha)
+
+        if arvore.inserir(no):
+            inseridos += 1
+        else:
+            duplicados += 1
+
+    return arvore, inseridos, duplicados
+
 
 def testar_leitura_cargas():
     """Confere se os seis arquivos foram carregados corretamente."""
