@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import time
 import tracemalloc
+import statistics
 
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
@@ -295,26 +296,34 @@ def testar_altura():
         del abb, avl
 
 
-def medir_memoria(funcao_construcao, registros):
-    """Mede o pico de memória durante a construção da árvore."""
 
-    tracemalloc.start()
+def medir_memoria(funcao_construcao, registros, repeticoes=5):
+    """Mede o pico de memória em cinco construções."""
 
-    arvore, inseridos, duplicados = funcao_construcao(registros)
+    medicoes = []
 
-    memoria_atual, memoria_pico = tracemalloc.get_traced_memory()
+    for _ in range(repeticoes):
+        tracemalloc.start()
 
-    tracemalloc.stop()
+        arvore, inseridos, duplicados = funcao_construcao(registros)
 
-    # Converte bytes para megabytes
-    memoria_mb = memoria_pico / (1024 * 1024)
+        memoria_atual, memoria_pico = tracemalloc.get_traced_memory()
 
-    return arvore, memoria_mb
+        tracemalloc.stop()
+
+        memoria_mb = memoria_pico / (1024 * 1024)
+        medicoes.append(memoria_mb)
+
+        del arvore
+
+    mediana = statistics.median(medicoes)
+
+    return mediana, medicoes
 
 
 
 def testar_memoria():
-    """Compara o pico de memória da ABB e da AVL."""
+    """Compara a mediana do pico de memória da ABB e AVL."""
 
     print("\n=== TESTE DE MEMÓRIA DAS ÁRVORES ===\n")
 
@@ -328,17 +337,25 @@ def testar_memoria():
         caminho = PASTA_CARGAS / nome_arquivo
         registros = carregar_registros(caminho)
 
-        abb, memoria_abb = medir_memoria(construir_abb, registros)
-        del abb
+        memoria_abb, execucoes_abb = medir_memoria(
+            construir_abb, registros
+        )
 
-        avl, memoria_avl = medir_memoria(construir_avl, registros)
-        del avl
+        memoria_avl, execucoes_avl = medir_memoria(
+            construir_avl, registros
+        )
 
         print(f"Carga: {tipo} ({quantidade} registros)")
-        print(f"Memória ABB: {memoria_abb:.4f} MB")
-        print(f"Memória AVL: {memoria_avl:.4f} MB")
-        print("-" * 50)
 
+        print(
+            f"ABB - mediana: {memoria_abb:.4f} MB"
+        )
+
+        print(
+            f"AVL - mediana: {memoria_avl:.4f} MB"
+        )
+
+        print("-" * 50)
 
 
 if __name__ == "__main__":
