@@ -2,6 +2,7 @@
 from pathlib import Path
 import sys
 import time
+import tracemalloc
 
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
@@ -294,8 +295,55 @@ def testar_altura():
         del abb, avl
 
 
+def medir_memoria(funcao_construcao, registros):
+    """Mede o pico de memória durante a construção da árvore."""
+
+    tracemalloc.start()
+
+    arvore, inseridos, duplicados = funcao_construcao(registros)
+
+    memoria_atual, memoria_pico = tracemalloc.get_traced_memory()
+
+    tracemalloc.stop()
+
+    # Converte bytes para megabytes
+    memoria_mb = memoria_pico / (1024 * 1024)
+
+    return arvore, memoria_mb
+
+
+
+def testar_memoria():
+    """Compara o pico de memória da ABB e da AVL."""
+
+    print("\n=== TESTE DE MEMÓRIA DAS ÁRVORES ===\n")
+
+    arquivos_teste = [
+        ARQUIVOS_CARGA[0],
+        ARQUIVOS_CARGA[3]
+    ]
+
+    for tipo, quantidade, nome_arquivo in arquivos_teste:
+
+        caminho = PASTA_CARGAS / nome_arquivo
+        registros = carregar_registros(caminho)
+
+        abb, memoria_abb = medir_memoria(construir_abb, registros)
+        del abb
+
+        avl, memoria_avl = medir_memoria(construir_avl, registros)
+        del avl
+
+        print(f"Carga: {tipo} ({quantidade} registros)")
+        print(f"Memória ABB: {memoria_abb:.4f} MB")
+        print(f"Memória AVL: {memoria_avl:.4f} MB")
+        print("-" * 50)
+
+
 
 if __name__ == "__main__":
     testar_leitura_cargas()
     testar_construcao()
     testar_tempo()
+    testar_altura()
+    testar_memoria()
