@@ -358,9 +358,149 @@ def testar_memoria():
         print("-" * 50)
 
 
+def executar_benchmark_completo():
+    """Executa todos os experimentos ABB x AVL."""
+
+    print("\n=== BENCHMARK COMPLETO ABB x AVL ===\n")
+
+    resultados = []
+
+    for tipo, quantidade, nome_arquivo in ARQUIVOS_CARGA:
+
+        caminho = PASTA_CARGAS / nome_arquivo
+        registros = carregar_registros(caminho)
+
+        print(f"\nCarga: {tipo} ({quantidade} registros)")
+
+        # Construção inicial para verificar inserções e duplicatas.
+        abb, abb_inseridos, abb_duplicados = construir_abb(registros)
+        avl, avl_inseridos, avl_duplicados = construir_avl(registros)
+
+        if abb_inseridos != avl_inseridos:
+            raise AssertionError("Quantidade de inserções diferente!")
+
+        if abb_duplicados != avl_duplicados:
+            raise AssertionError("Quantidade de duplicatas diferente!")
+
+        # Medição das alturas.
+        altura_abb = medir_altura(abb.raiz)
+        altura_avl = medir_altura(avl.raiz)
+
+        if altura_avl != avl.altura():
+            raise AssertionError("Altura armazenada da AVL incorreta!")
+
+        # Verificação do limite teórico da AVL.
+        limite_avl = 1.45 * math.log2(abb_inseridos + 2)
+
+        if altura_avl > limite_avl:
+            raise AssertionError("A AVL ultrapassou o limite de altura!")
+
+        # Libera as árvores da construção inicial.
+        del abb, avl
+
+        # Medição de tempo: cinco execuções.
+        tempo_abb, tempos_abb = medir_tempo_construcao(
+            construir_abb, registros
+        )
+
+        tempo_avl, tempos_avl = medir_tempo_construcao(
+            construir_avl, registros
+        )
+
+        # Medição de memória: cinco execuções.
+        memoria_abb, memorias_abb = medir_memoria(
+            construir_abb, registros
+        )
+
+        memoria_avl, memorias_avl = medir_memoria(
+            construir_avl, registros
+        )
+
+        # Armazena os resultados do cenário.
+        resultado = {
+            "distribuicao": tipo,
+            "quantidade_registros": quantidade,
+            "registros_inseridos": abb_inseridos,
+            "duplicados": abb_duplicados,
+            "primeiros_7_registros": registros[:7],
+            "tempo_mediano_abb_ms": tempo_abb,
+            "tempo_mediano_avl_ms": tempo_avl,
+            "altura_abb": altura_abb,
+            "altura_avl": altura_avl,
+            "limite_altura_avl": limite_avl,
+            "avl_dentro_limite": altura_avl <= limite_avl,
+            "memoria_mediana_abb_mb": memoria_abb,
+            "memoria_mediana_avl_mb": memoria_avl
+        }
+
+        resultados.append(resultado)
+
+        # Exibe um resumo do cenário.
+        print(f"Registros inseridos: {abb_inseridos}")
+        print(f"Duplicados: {abb_duplicados}")
+
+        print(f"Tempo ABB: {tempo_abb:.3f} ms")
+        print(f"Tempo AVL: {tempo_avl:.3f} ms")
+
+        print(f"Altura ABB: {altura_abb}")
+        print(f"Altura AVL: {altura_avl}")
+        print(f"Limite AVL: {limite_avl:.2f}")
+
+        print(f"Memória ABB: {memoria_abb:.4f} MB")
+        print(f"Memória AVL: {memoria_avl:.4f} MB")
+
+        print("AVL dentro do limite:", altura_avl <= limite_avl)
+
+        print("-" * 55)
+
+    return resultados
+
+
+def salvar_resultados_csv(resultados):
+    """Salva os resultados do benchmark em um arquivo CSV."""
+
+    pasta_resultados = RAIZ / "benchmark"
+    pasta_resultados.mkdir(parents=True, exist_ok=True)
+
+    caminho_csv = pasta_resultados / "resultados_benchmark.csv"
+
+    campos = [
+        "distribuicao",
+        "quantidade_registros",
+        "registros_inseridos",
+        "duplicados",
+        "primeiros_7_registros",
+        "tempo_mediano_abb_ms",
+        "tempo_mediano_avl_ms",
+        "altura_abb",
+        "altura_avl",
+        "limite_altura_avl",
+        "avl_dentro_limite",
+        "memoria_mediana_abb_mb",
+        "memoria_mediana_avl_mb"
+    ]
+
+    with open(caminho_csv, "w", newline="", encoding="utf-8-sig") as arquivo:
+
+        escritor = csv.DictWriter(arquivo, fieldnames=campos)
+
+        escritor.writeheader()
+
+        for resultado in resultados:
+            linha = resultado.copy()
+
+            linha["primeiros_7_registros"] = repr(
+                linha["primeiros_7_registros"]
+            )
+
+            escritor.writerow(linha)
+
+    print("\n=== EXPORTAÇÃO DOS RESULTADOS ===")
+    print(f"Arquivo salvo em: {caminho_csv}")
+
+
 if __name__ == "__main__":
-    testar_leitura_cargas()
-    testar_construcao()
-    testar_tempo()
-    testar_altura()
-    testar_memoria()
+
+    resultados = executar_benchmark_completo()
+
+    salvar_resultados_csv(resultados)
