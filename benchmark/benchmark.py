@@ -228,7 +228,74 @@ def testar_tempo():
 
 
 
+def medir_altura(raiz):
+    """
+    Calcula a altura da árvore sem recursão.
+
+    Árvore vazia: altura 0.
+    Árvore com apenas a raiz: altura 1.
+    """
+
+    if raiz is None:
+        return 0
+
+    maior_altura = 0
+    pilha = [(raiz, 1)]
+
+    while pilha:
+        no, nivel = pilha.pop()
+
+        if nivel > maior_altura:
+            maior_altura = nivel
+
+        if no.esquerda is not None:
+            pilha.append((no.esquerda, nivel + 1))
+
+        if no.direita is not None:
+            pilha.append((no.direita, nivel + 1))
+
+    return maior_altura
+
+
+
+def testar_altura():
+    """Compara as alturas finais da ABB e da AVL."""
+
+    print("\n=== TESTE DE ALTURA DAS ÁRVORES ===\n")
+
+    arquivos_teste = [
+        ARQUIVOS_CARGA[0],
+        ARQUIVOS_CARGA[3]
+    ]
+
+    for tipo, quantidade, nome_arquivo in arquivos_teste:
+
+        caminho = PASTA_CARGAS / nome_arquivo
+        registros = carregar_registros(caminho)
+
+        abb, _, _ = construir_abb(registros)
+        avl, _, _ = construir_avl(registros)
+
+        altura_abb = medir_altura(abb.raiz)
+        altura_avl = medir_altura(avl.raiz)
+
+        # Confere se a altura armazenada pela AVL está correta.
+        if altura_avl != avl.altura():
+            raise AssertionError(
+                "A altura armazenada pela AVL não corresponde "
+                "à altura calculada."
+            )
+
+        print(f"Carga: {tipo} ({quantidade} registros)")
+        print(f"Altura ABB: {altura_abb}")
+        print(f"Altura AVL: {altura_avl}")
+        print("-" * 50)
+
+        del abb, avl
+
+
 
 if __name__ == "__main__":
     testar_leitura_cargas()
     testar_construcao()
+    testar_tempo()
