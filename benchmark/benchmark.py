@@ -4,6 +4,8 @@ import sys
 import time
 import tracemalloc
 import statistics
+import csv
+import math
 
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
@@ -189,9 +191,7 @@ def medir_tempo_construcao(funcao_construcao, registros, repeticoes=5):
 
         del arvore
 
-    tempos.sort()
-
-    mediana = tempos[len(tempos) // 2]
+    mediana = statistics.median(tempos)
 
     return mediana, tempos
 
