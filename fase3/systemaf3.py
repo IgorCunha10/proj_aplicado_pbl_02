@@ -129,8 +129,13 @@ class HashIndiceLinha:
                 lo = mid+1
             else:
                 hi = mid
-        if lo < len(lst) and lst[lo].data == data and lst[lo].horario == horario:
-            lst.pop(lo)
+                if (
+                        lo < len(lst)
+                        and lst[lo].data == data
+                        and lst[lo].horario == horario
+                        and lst[lo].linha == linha
+                ):
+                    lst.pop(lo)
             # se lista ficou vazia, pode remover entrada do bucket (ou nao, pois é opcional)
             return True
         return False

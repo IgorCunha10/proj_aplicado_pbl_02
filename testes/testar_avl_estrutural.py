@@ -85,8 +85,55 @@ def testar_remocoes():
     print("[OK] Remoções e balanceamento")
 
 
+def testar_indice_apos_remocao():
+    arvore = AVL()
+
+    registros = [
+        No("2026-01-01", "10:00:00", "L1"),
+        No("2026-01-01", "05:00:00", "L1"),
+        No("2026-01-01", "15:00:00", "L1"),
+        No("2026-01-01", "12:00:00", "L1"),
+        No("2026-01-01", "10:00:00", "L2"),
+    ]
+
+    # Inserimos os registros na AVL.
+    for registro in registros:
+        arvore.inserir(registro)
+
+    # Removemos o registro L1 das 10 horas.
+    removido = arvore.remover(
+        No("2026-01-01", "10:00:00", "L1")
+    )
+
+    assert removido, "A remoção deveria ter sido realizada."
+
+    # Consultamos a próxima chegada da linha L1.
+    resultado_l1 = arvore.proximo_linha(
+        "2026-01-01", "00:00:00", "L1"
+    )
+
+    assert resultado_l1 is not None
+    assert resultado_l1.horario == "05:00:00"
+
+    # Conferimos se a linha L2 continua independente.
+    resultado_l2 = arvore.proximo_linha(
+        "2026-01-01", "00:00:00", "L2"
+    )
+
+    assert resultado_l2 is not None
+    assert resultado_l2.linha == "L2"
+
+    # Verificamos novamente a estrutura da AVL.
+    verificar_arvore(arvore.raiz)
+
+    print("[OK] Índice após remoção com dois filhos")
+
+
+
 if __name__ == "__main__":
     testar_balanceamento()
     testar_remocoes()
+    testar_indice_apos_remocao()
 
     print("\nTodos os testes estruturais passaram!")
+
