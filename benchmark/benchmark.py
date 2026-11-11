@@ -1,6 +1,7 @@
 
 from pathlib import Path
 import sys
+import time
 
 RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
@@ -170,5 +171,64 @@ def testar_leitura_cargas():
         print("-" * 45)
 
 
+def medir_tempo_construcao(funcao_construcao, registros, repeticoes=5):
+    """Mede o tempo de construção de uma árvore em milissegundos."""
+
+    tempos = []
+
+    for _ in range(repeticoes):
+        inicio = time.perf_counter()
+
+        arvore, inseridos, duplicados = funcao_construcao(registros)
+
+        fim = time.perf_counter()
+
+        tempos.append((fim - inicio) * 1000)
+
+        del arvore
+
+    tempos.sort()
+
+    mediana = tempos[len(tempos) // 2]
+
+    return mediana, tempos
+
+
+def testar_tempo():
+    """Compara o tempo de construção da ABB e da AVL."""
+
+    print("\n=== TESTE DE TEMPO DE CONSTRUÇÃO ===\n")
+
+    arquivos_teste = [
+        ARQUIVOS_CARGA[0],
+        ARQUIVOS_CARGA[3]
+    ]
+
+    for tipo, quantidade, nome_arquivo in arquivos_teste:
+
+        caminho = PASTA_CARGAS / nome_arquivo
+        registros = carregar_registros(caminho)
+
+        tempo_abb, execucoes_abb = medir_tempo_construcao(
+            construir_abb, registros
+        )
+
+        tempo_avl, execucoes_avl = medir_tempo_construcao(
+            construir_avl, registros
+        )
+
+        print(f"Carga: {tipo} ({quantidade} registros)")
+        print(f"ABB - tempos: {[round(t, 3) for t in execucoes_abb]} ms")
+        print(f"ABB - mediana: {tempo_abb:.3f} ms")
+
+        print(f"AVL - tempos: {[round(t, 3) for t in execucoes_avl]} ms")
+        print(f"AVL - mediana: {tempo_avl:.3f} ms")
+
+        print("-" * 50)
+
+
+
+
 if __name__ == "__main__":
     testar_leitura_cargas()
+    testar_construcao()
