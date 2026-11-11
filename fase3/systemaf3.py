@@ -190,11 +190,51 @@ class AVL:
         return self._buscar_no(self.raiz, alvo)
 
     # R6 (decisão 3.1 do relatório: remoção com sucessor + rebalanceamento)
+
     def remover(self, alvo):
-        if not self._buscar_no(self.raiz, alvo):
+        # Localiza o próprio objeto que será removido.
+        atual = self.raiz
+
+        while atual:
+            r = comparar(alvo, atual)
+
+            if r == 0:
+                break
+            elif r < 0:
+                atual = atual.esquerda
+            else:
+                atual = atual.direita
+
+        if atual is None:
             return False
+
+        # Verifica se o nó possui dois filhos.
+        sucessor = None
+
+        if atual.esquerda is not None and atual.direita is not None:
+            sucessor = atual.direita
+
+            while sucessor.esquerda:
+                sucessor = sucessor.esquerda
+
+        # Remove as referências antigas antes de modificar os nós.
+        self.indice.remover(atual.data, atual.horario, atual.linha)
+
+        if sucessor is not None:
+            self.indice.remover(
+                sucessor.data,
+                sucessor.horario,
+                sucessor.linha
+            )
+
+        # Executa a remoção e o rebalanceamento.
         self.raiz = self._remover(self.raiz, alvo)
-        self.indice.remover(alvo.data, alvo.horario, alvo.linha)
+
+        # O objeto atual recebeu os dados do sucessor.
+        # Precisamos registrá-lo novamente no índice.
+        if sucessor is not None:
+            self.indice.inserir_ordenado(atual)
+
         return True
 
     def _remover(self, no, alvo):
