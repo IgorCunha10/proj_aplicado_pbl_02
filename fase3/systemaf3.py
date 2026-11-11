@@ -120,24 +120,32 @@ class HashIndiceLinha:
 
     def remover(self, data, horario, linha):
         b, idx, lst = self._get_bucket_entry(linha)
-        if lst is None: return False
+
+        if lst is None:
+            return False
+
         lo, hi = 0, len(lst)
         chave = (data, horario)
+
+        # Busca binária
         while lo < hi:
-            mid = (lo+hi)//2
+            mid = (lo + hi) // 2
+
             if (lst[mid].data, lst[mid].horario) < chave:
-                lo = mid+1
+                lo = mid + 1
             else:
                 hi = mid
-                if (
-                        lo < len(lst)
-                        and lst[lo].data == data
-                        and lst[lo].horario == horario
-                        and lst[lo].linha == linha
-                ):
-                    lst.pop(lo)
-            # se lista ficou vazia, pode remover entrada do bucket (ou nao, pois é opcional)
+
+        # Verifica o registro encontrado
+        if (
+                lo < len(lst)
+                and lst[lo].data == data
+                and lst[lo].horario == horario
+                and lst[lo].linha == linha
+        ):
+            lst.pop(lo)
             return True
+
         return False
 
     def proximo_linha(self, data, horario, linha):
