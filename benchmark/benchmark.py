@@ -100,6 +100,43 @@ def construir_avl(registros):
     return arvore, inseridos, duplicados
 
 
+def testar_construcao():
+    """Compara a quantidade de inserções nas duas árvores."""
+
+    print("\n=== TESTE DE CONSTRUÇÃO DAS ÁRVORES ===\n")
+
+    # Começamos somente com as duas cargas de 1.000 registros.
+    arquivos_teste = [
+        ARQUIVOS_CARGA[0],
+        ARQUIVOS_CARGA[3]
+    ]
+
+    for tipo, quantidade, nome_arquivo in arquivos_teste:
+
+        caminho = PASTA_CARGAS / nome_arquivo
+        registros = carregar_registros(caminho)
+
+        abb, abb_inseridos, abb_duplicados = construir_abb(registros)
+        avl, avl_inseridos, avl_duplicados = construir_avl(registros)
+
+        print(f"Carga: {tipo} ({quantidade} registros)")
+        print(f"ABB: {abb_inseridos} inseridos, {abb_duplicados} duplicados")
+        print(f"AVL: {avl_inseridos} inseridos, {avl_duplicados} duplicados")
+
+        if abb_inseridos != avl_inseridos:
+            raise AssertionError("As árvores inseriram quantidades diferentes!")
+
+        if abb_duplicados != avl_duplicados:
+            raise AssertionError("As árvores identificaram duplicatas diferentes!")
+
+        if abb_inseridos + abb_duplicados != len(registros):
+            raise AssertionError("Quantidade de registros inconsistente!")
+
+        print("Resultado: OK\n")
+
+        del abb, avl
+
+
 def testar_leitura_cargas():
     """Confere se os seis arquivos foram carregados corretamente."""
 
