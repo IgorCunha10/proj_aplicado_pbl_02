@@ -363,6 +363,18 @@ def executar(arv, partes):
         return [f"{d} {e}" for d,e in arv.espera_semanal(partes[1],partes[2],partes[3],int(partes[4]))]
     return []
 
+
+def LINHAS(self, data1, hora1, data2, hora2):
+        linhas = self.obter_lista(data1, hora1)
+        linhas2 = self.obter_lista(data2, hora2)
+
+        tdLinhas = [linhas, linhas2]
+
+        linhasOrd = self.ordenar(tdLinhas)
+
+        return
+
+
 def main():
     if len(sys.argv)!=2:
         print("Uso: python sistema_avl.py arquivo.txt", file=sys.stderr); return
@@ -378,5 +390,7 @@ def main():
     dt=(time.perf_counter()-t0)*1000
     for s in saidas: print(s)
     print(f"TEMPO_MS {dt:.3f}", file=sys.stderr)
+
+
 
 if __name__=="__main__": main()
